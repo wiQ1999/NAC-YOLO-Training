@@ -1,0 +1,5 @@
+path: E:\WSB\Praca_Magisterska_2\Skrypty\NAC YOLO Training\dataset\images
+train: .
+val: .
+names:
+  0: crater
