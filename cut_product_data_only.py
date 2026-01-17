@@ -68,9 +68,9 @@ def cut_tiles_skip_empty(
 
 if __name__ == "__main__":
     cut_tiles_skip_empty(
-        input_tif=r"E:\WSB\Praca_Magisterska_2\Maps\CE-6\processed_M166854798L_sldem2015\tif\M166854798L_lambert_sldem2015_8bit_georef_linear.tif",
-        output_dir=r"E:\WSB\Praca_Magisterska_2\Skrypty\NAC YOLO Training\datasets\M166854798L\train",
-        tile_width=640, 
-        tile_height=640)
+        input_tif=r"E:\WSB\Praca_Magisterska_2\Maps\CE-6\processed_bash\tif\M176299749LE_polinormal1.tif",
+        output_dir=r"E:\WSB\Praca_Magisterska_2\Skrypty\NAC YOLO Training\datasets\M176299749L_480x480\images\train_tif",
+        tile_width=480, 
+        tile_height=480)
 
     pass
