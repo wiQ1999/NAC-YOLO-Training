@@ -121,8 +121,8 @@ for img in "${IMG_FILES[@]}"; do
   lronac2isis from="$img" to="$raw_cub"
 
   # 2) SPICE init (with DEM)
-  log_run "spiceinit from=\"$raw_cub\" spksmithed=true spkrecon=false shape=user model=\"$DEM_CUB\" web=true"
-  spiceinit from="$raw_cub" spksmithed=true spkrecon=false shape=user model="$DEM_CUB" web=true
+  log_run "spiceinit from=\"$raw_cub\" spksmithed=true spkrecon=true shape=user model=\"$DEM_CUB\" web=true"
+  spiceinit from="$raw_cub" spksmithed=true spkrecon=true shape=user model="$DEM_CUB" web=true
 
   # 3) Radiometric calibration
   log_run "lronaccal from=\"$raw_cub\" to=\"$cal_cub\""
