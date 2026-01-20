@@ -7,9 +7,9 @@ from shapely.geometry import box
 # -----------------------------
 # KONFIGURACJA
 # -----------------------------
-TILES_DIR = Path(r"E:\WSB\Praca_Magisterska_2\Skrypty\NAC YOLO Training\datasets\M176299749L_480x480\images\train_tif")          # katalog z kafelkami .tif
-SHP_PATH  = Path(r"E:\WSB\Praca_Magisterska_2\Datasets\YOLOv8-LCNET\CE6_S1_3m_crater_larger30m — kopia.shp")# SHP już przycięty do całego TIF (krok 1)
-OUT_DIR   = Path(r"E:\WSB\Praca_Magisterska_2\Skrypty\NAC YOLO Training\datasets\M176299749L_480x480\labels\train_png")        # gdzie zapisać .txt
+TILES_DIR = Path(r"E:\WSB\Praca_Magisterska_2\Skrypty\NAC YOLO Training\datasets\prototyp_480x480_LQ_val\images\M1470068475R_clipped_128x128")          # katalog z kafelkami .tif
+SHP_PATH  = Path(r"E:\WSB\Praca_Magisterska_2\Maps\CE-6\QGIS\M1470068475R_clipped_craters100.gpkg")# SHP już przycięty do całego TIF (krok 1)
+OUT_DIR   = Path(r"E:\WSB\Praca_Magisterska_2\Skrypty\NAC YOLO Training\datasets\prototyp_480x480_LQ_val\labels\test_LQ")        # gdzie zapisać .txt
 
 CLASS_ID = 0                             # jedna klasa: crater
 

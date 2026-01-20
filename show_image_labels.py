@@ -11,7 +11,7 @@ def show_yolo_label(img_path, label_path=None, line_width=1):
         raise FileNotFoundError(img_path)
 
     h, w = im.shape[:2]
-    ann = Annotator(im, line_width=line_width)  # :contentReference[oaicite:1]{index=1}
+    ann = Annotator(im, line_width=line_width)
 
     if label_path.exists():
         for line in label_path.read_text().splitlines():
@@ -23,7 +23,7 @@ def show_yolo_label(img_path, label_path=None, line_width=1):
             x2 = int((xc + bw / 2) * w)
             y2 = int((yc + bh / 2) * h)
 
-            ann.box_label([x1, y1, x2, y2], color=(0, 255, 0))  # :contentReference[oaicite:2]{index=2}
+            ann.box_label([x1, y1, x2, y2], color=(0, 255, 0))
 
     out = ann.result()
     cv2.imshow("GT labels", out)
@@ -31,10 +31,11 @@ def show_yolo_label(img_path, label_path=None, line_width=1):
     cv2.destroyAllWindows()
 
 
-dir = r"E:\\WSB\\Praca_Magisterska_2\Skrypty\\NAC YOLO Training\\datasets\\M166854798L\\"
-photo_name = r"M166854798L_lambert_sldem2015_8bit_georef_linear_x3200_y22400_w640_h640"
+dir = r"E:\\WSB\\Praca_Magisterska_2\\Skrypty\\NAC YOLO Training\\datasets\\prototyp_480x480_LQ_val\\"
+photo_name = "M1470068475R_clipped_polynominal1_x2176_y12160_w128_h128"
+target = "test_LQ"
 
 show_yolo_label(
-    img_path=dir + r"train_png\\" + photo_name + r".png", 
-    label_path=dir + r"train_labels\\" + photo_name + r".txt",
+    img_path=dir + fr"images\\{target}\\" + photo_name + r".png", 
+    label_path=dir + fr"labels\\{target}\\" + photo_name + r".txt",
     line_width=1)

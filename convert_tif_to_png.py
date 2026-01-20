@@ -44,8 +44,9 @@ def batch_convert(input_dir: str | Path,
         out = output_dir / (tif.stem + ".png")
         tif8_gray_to_png(tif, out, to_rgb=to_rgb)
 
+dir = r"E:\\WSB\\Praca_Magisterska_2\\Skrypty\\NAC YOLO Training\\datasets\\prototyp_480x480_LQ_val\\images\\"
 
 batch_convert(
-    input_dir=r"E:\WSB\Praca_Magisterska_2\Skrypty\NAC YOLO Training\datasets\M166854798L\train_tif", 
-    output_dir=r"E:\WSB\Praca_Magisterska_2\Skrypty\NAC YOLO Training\datasets\M166854798L\train_png", 
+    input_dir=dir + "M1470068475R_clipped_128x128", 
+    output_dir=dir + "test_LQ", 
     to_rgb=True)
