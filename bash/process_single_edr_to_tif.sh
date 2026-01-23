@@ -4,16 +4,19 @@ set -euo pipefail
 usage() {
   cat << 'EOF'
 Usage:
-  process_nac_edr_to_tif.sh -i /path/to/M123...LE.IMG -o /path/to/outdir -dem /path/to/dem.cub
+  process_single_edr_to_tif.sh -i /input/NAC.IMG -o /output/folder -d /path/to/dem.cub
 
 Required:
   -i, --input     Path to NAC EDR IMG (e.g., M166854798LE.IMG)
   -o, --outdir    Output directory (final .tif goes here)
-  -dem            Path to DEM cube (e.g., GLD100+LOLA .demprep.cub).
+  -d, --dem       Path to DEM cube (e.g., GLD100+LOLA .demprep.cub).
 
 Notes:
   - Script expects ISIS + GDAL tools available in PATH (activate your conda env first).
   - Removes trailing 'E' from product ID after the first stage (e.g., ...LE -> ...L).
+
+Example:
+  ./process_single_edr_to_tif.sh -i ./data/EDR/HQ/M176299749LE.IMG -o ./data/GeoTIFF -d SLDEM.demprep.cub
 EOF
 }
 
@@ -27,7 +30,7 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     -i|--input)   IN="$2"; shift 2 ;;
     -o|--outdir)  OUTDIR="$2"; shift 2 ;;
-    -dem)         DEM="$2"; shift 2 ;;
+    -d|--dem)     DEM="$2"; shift 2 ;;
     -h|--help)    usage; exit 0 ;;
     *) echo "Unknown argument: $1"; usage; exit 1 ;;
   esac
