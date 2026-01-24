@@ -164,5 +164,5 @@ def _parse_args():
 
 if __name__ == "__main__":
     args = _parse_args()
-    n = cut_square_tiles(args.input, args.output_dir, args.tile_size)
-    print(f"Zapisano {n} kafelków do: {args.output_dir}")
+    n = cut_square_tiles(args.input, args.output, args.size)
+    print(f"Zapisano {n} kafelków do: {args.output}")
