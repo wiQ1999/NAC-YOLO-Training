@@ -7,7 +7,12 @@ import numpy as np
 from osgeo import gdal
 
 
-def _valid_bounds(mask_band: gdal.Band, xsize: int, ysize: int, chunk_h: int = 1024) -> Tuple[int, int, int, int]:
+def _valid_bounds(
+    mask_band: gdal.Band,
+    xsize: int,
+    ysize: int,
+    chunk_h: int = 1024,
+) -> Tuple[int, int, int, int]:
     x0, y0, x1, y1 = xsize, ysize, -1, -1
 
     for y in range(0, ysize, chunk_h):
@@ -34,7 +39,13 @@ def _valid_bounds(mask_band: gdal.Band, xsize: int, ysize: int, chunk_h: int = 1
     return x0, y0, x1, y1
 
 
-def _row_masks(mask_band: gdal.Band, x0: int, x_end: int, yoff: int, tile_size: int) -> Tuple[np.ndarray, np.ndarray]:
+def _row_masks(
+    mask_band: gdal.Band,
+    x0: int,
+    x_end: int,
+    yoff: int,
+    tile_size: int,
+) -> Tuple[np.ndarray, np.ndarray]:
     w = x_end - x0
     top = mask_band.ReadAsArray(x0, yoff, w, 1)
     bottom = mask_band.ReadAsArray(x0, yoff + tile_size - 1, w, 1)
@@ -43,13 +54,25 @@ def _row_masks(mask_band: gdal.Band, x0: int, x_end: int, yoff: int, tile_size: 
     return top[0], bottom[0]
 
 
-def _corners_ok(top: np.ndarray, bottom: np.ndarray, x0: int, xoff: int, tile_size: int) -> bool:
+def _corners_ok(
+    top: np.ndarray,
+    bottom: np.ndarray,
+    x0: int,
+    xoff: int,
+    tile_size: int,
+) -> bool:
     i = xoff - x0
     j = i + tile_size - 1
     return (top[i] != 0) and (top[j] != 0) and (bottom[i] != 0) and (bottom[j] != 0)
 
 
-def _find_first_x(top: np.ndarray, bottom: np.ndarray, x0: int, x_end: int, tile_size: int) -> Optional[int]:
+def _find_first_x(
+    top: np.ndarray,
+    bottom: np.ndarray,
+    x0: int,
+    x_end: int,
+    tile_size: int,
+) -> Optional[int]:
     last = x_end - tile_size
     for xoff in range(x0, last + 1):
         if _corners_ok(top, bottom, x0, xoff, tile_size):
@@ -61,7 +84,6 @@ def cut_square_tiles(
     input_tif: str | Path,
     output_dir: str | Path,
     tile_size: int,
-    padding: int = 0,
 ) -> int:
     gdal.UseExceptions()
 
@@ -77,20 +99,15 @@ def cut_square_tiles(
     bands = ds.RasterCount
     if tile_size <= 0:
         raise ValueError("tile_size musi być > 0")
-    if padding < 0:
-        raise ValueError("padding musi być >= 0")
     if bands < 1:
         raise RuntimeError("Raster nie zawiera pasm.")
 
     band1 = ds.GetRasterBand(1)
     mask_band = band1.GetMaskBand()
 
-    bx0, by0, bx1, by1 = _valid_bounds(mask_band, xsize, ysize)
-    x0, y0, x1, y1 = bx0 + padding, by0 + padding, bx1 - padding, by1 - padding
-    if x0 > x1 or y0 > y1:
-        raise RuntimeError("Padding daje pusty obszar danych.")
-
+    x0, y0, x1, y1 = _valid_bounds(mask_band, xsize, ysize)
     x_end, y_end = x1 + 1, y1 + 1
+
     base = in_path.stem
     written = 0
 
@@ -101,6 +118,7 @@ def cut_square_tiles(
         if _find_first_x(top, bottom, x0, x_end, tile_size) is not None:
             y_start = y
             break
+
     if y_start is None:
         ds = None
         return 0
@@ -115,7 +133,9 @@ def cut_square_tiles(
             if not _corners_ok(top, bottom, x0, xoff, tile_size):
                 continue
 
-            out_path = out_dir / f"{base}_{tile_size}_y{yoff}_x{xoff}.tif"
+            out_name = f"{base}_{tile_size}_y{yoff}_x{xoff}.tif"
+            out_path = out_dir / out_name
+
             opts = gdal.TranslateOptions(
                 format="GTiff",
                 srcWin=[xoff, yoff, tile_size, tile_size],
@@ -136,14 +156,13 @@ def _parse_args():
     import argparse
 
     p = argparse.ArgumentParser()
-    p.add_argument("-i", "--input", required=True)
-    p.add_argument("-o", "--output-dir", required=True)
-    p.add_argument("-s", "--tile-size", type=int, required=True)
-    p.add_argument("-p", "--padding", type=int, default=0)
+    p.add_argument("-i", "--input", required=True, help="Plik w formacie .tif/.tiff.")
+    p.add_argument("-o", "--output", required=True, help="Katalog docelowy na kafelki.")
+    p.add_argument("-s", "--size", type=int, required=True, help="Rozmiar kafelka (piksele).")
     return p.parse_args()
 
 
 if __name__ == "__main__":
     args = _parse_args()
-    n = cut_square_tiles(args.input, args.output_dir, args.tile_size, args.padding)
+    n = cut_square_tiles(args.input, args.output_dir, args.tile_size)
     print(f"Zapisano {n} kafelków do: {args.output_dir}")
