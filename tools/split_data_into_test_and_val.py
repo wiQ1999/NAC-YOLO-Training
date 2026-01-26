@@ -10,10 +10,10 @@ Założenia:
 
 Przykład:
 python ./tools/split_data_into_test_and_val.py \
-  --png-src ./datasets/HQ/images/raw/train \
-  --png-dst ./datasets/HQ/images/val \
-  --txt-src ./datasets/HQ/labels/raw/train \
-  --txt-dst ./datasets/HQ/labels/val \
+  --png-in ./datasets/HQ/images/raw/train \
+  --png-out ./datasets/HQ/images/val \
+  --txt-in ./datasets/HQ/labels/raw/train \
+  --txt-out ./datasets/HQ/labels/val \
   --ratio 0.2 \
   --seed 123
 """
@@ -30,10 +30,10 @@ from typing import Iterable, List, Set, Tuple
 
 @dataclass(frozen=True)
 class Config:
-    png_src: Path
-    png_dst: Path
-    txt_src: Path
-    txt_dst: Path
+    png_in: Path
+    png_out: Path
+    txt_in: Path
+    txt_out: Path
     ratio: float
     seed: int | None
 
@@ -45,9 +45,9 @@ def _list_stems(directory: Path, suffix: str) -> Set[str]:
     return {p.stem for p in directory.iterdir() if p.is_file() and p.suffix.lower() == suffix.lower()}
 
 
-def _validate_pairs(png_src: Path, txt_src: Path) -> List[str]:
-    png_stems = _list_stems(png_src, ".png")
-    txt_stems = _list_stems(txt_src, ".txt")
+def _validate_pairs(png_in: Path, txt_in: Path) -> List[str]:
+    png_stems = _list_stems(png_in, ".png")
+    txt_stems = _list_stems(txt_in, ".txt")
 
     only_png = sorted(png_stems - txt_stems)
     only_txt = sorted(txt_stems - png_stems)
@@ -61,7 +61,7 @@ def _validate_pairs(png_src: Path, txt_src: Path) -> List[str]:
         raise ValueError("\n".join(msg_lines))
 
     if not png_stems:
-        raise ValueError(f"Brak plików PNG w katalogu: {png_src}")
+        raise ValueError(f"Brak plików PNG w katalogu: {png_in}")
 
     return sorted(png_stems)
 
@@ -77,7 +77,7 @@ def _ensure_empty_collision(dst_dir: Path, filenames: Iterable[str]) -> None:
 
 
 def split_test_to_val(cfg: Config) -> Tuple[int, int]:
-    stems = _validate_pairs(cfg.png_src, cfg.txt_src)
+    stems = _validate_pairs(cfg.png_in, cfg.txt_in)
 
     if not (0.0 <= cfg.ratio <= 1.0):
         raise ValueError("--ratio musi być w zakresie [0, 1].")
@@ -88,28 +88,28 @@ def split_test_to_val(cfg: Config) -> Tuple[int, int]:
     rng = random.Random(cfg.seed)
     selected = set(rng.sample(stems, k=to_move)) if to_move > 0 else set()
 
-    cfg.png_dst.mkdir(parents=True, exist_ok=True)
-    cfg.txt_dst.mkdir(parents=True, exist_ok=True)
+    cfg.png_out.mkdir(parents=True, exist_ok=True)
+    cfg.txt_out.mkdir(parents=True, exist_ok=True)
 
     png_names = [f"{s}.png" for s in selected]
     txt_names = [f"{s}.txt" for s in selected]
-    _ensure_empty_collision(cfg.png_dst, png_names)
-    _ensure_empty_collision(cfg.txt_dst, txt_names)
+    _ensure_empty_collision(cfg.png_out, png_names)
+    _ensure_empty_collision(cfg.txt_out, txt_names)
 
     moved = 0
     for stem in sorted(selected):
-        png_src_file = cfg.png_src / f"{stem}.png"
-        txt_src_file = cfg.txt_src / f"{stem}.txt"
-        png_dst_file = cfg.png_dst / f"{stem}.png"
-        txt_dst_file = cfg.txt_dst / f"{stem}.txt"
+        png_in_file = cfg.png_in / f"{stem}.png"
+        txt_in_file = cfg.txt_in / f"{stem}.txt"
+        png_out_file = cfg.png_out / f"{stem}.png"
+        txt_out_file = cfg.txt_out / f"{stem}.txt"
 
-        if not png_src_file.exists() or not txt_src_file.exists():
+        if not png_in_file.exists() or not txt_in_file.exists():
             raise FileNotFoundError(
-                f"Brak pary w trakcie przenoszenia: {png_src_file.name} / {txt_src_file.name}"
+                f"Brak pary w trakcie przenoszenia: {png_in_file.name} / {txt_in_file.name}"
             )
 
-        shutil.move(str(png_src_file), str(png_dst_file))
-        shutil.move(str(txt_src_file), str(txt_dst_file))
+        shutil.move(str(png_in_file), str(png_out_file))
+        shutil.move(str(txt_in_file), str(txt_out_file))
         moved += 1
 
     remaining = total - moved
@@ -118,19 +118,19 @@ def split_test_to_val(cfg: Config) -> Tuple[int, int]:
 
 def parse_args() -> Config:
     p = argparse.ArgumentParser(description="Wydziela pliki oraz etykiety do wskazanego katalogu według proporcji.")
-    p.add_argument("--png-src", required=True, type=Path, help="Katalog źródłowy PNG (test).")
-    p.add_argument("--png-dst", required=True, type=Path, help="Katalog docelowy PNG (val).")
-    p.add_argument("--txt-src", required=True, type=Path, help="Katalog źródłowy TXT (test).")
-    p.add_argument("--txt-dst", required=True, type=Path, help="Katalog docelowy TXT (val).")
+    p.add_argument("--png-in", required=True, type=Path, help="Katalog źródłowy PNG (test).")
+    p.add_argument("--png-out", required=True, type=Path, help="Katalog docelowy PNG (val).")
+    p.add_argument("--txt-in", required=True, type=Path, help="Katalog źródłowy TXT (test).")
+    p.add_argument("--txt-out", required=True, type=Path, help="Katalog docelowy TXT (val).")
     p.add_argument("--ratio", required=True, type=float, help="Ułamek par do przeniesienia do val (0..1). N = int(total * ratio).")
     p.add_argument("--seed", type=int, default=None, help="Ziarno losowania (opcjonalne).")
     args = p.parse_args()
 
     return Config(
-        png_src=args.png_src,
-        png_dst=args.png_dst,
-        txt_src=args.txt_src,
-        txt_dst=args.txt_dst,
+        png_in=args.png_in,
+        png_out=args.png_out,
+        txt_in=args.txt_in,
+        txt_out=args.txt_out,
         ratio=args.ratio,
         seed=args.seed
     )
@@ -142,8 +142,8 @@ def main() -> None:
 
     print(f"Przeniesiono par: {moved}")
     print(f"Pozostało w test: {remaining}")
-    print(f"PNG: {cfg.png_src} -> {cfg.png_dst}")
-    print(f"TXT: {cfg.txt_src} -> {cfg.txt_dst}")
+    print(f"PNG: {cfg.png_in} -> {cfg.png_out}")
+    print(f"TXT: {cfg.txt_in} -> {cfg.txt_out}")
 
 
 if __name__ == "__main__":
