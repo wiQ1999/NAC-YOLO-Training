@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""split_dataset_png_txt_simplified.py
+"""split_png_adn_labels_data.py
 
 Losowo dzieli pary (PNG + TXT) na 2 zbiory (test/val) lub 3 zbiory (train/val/test).
 
@@ -11,7 +11,7 @@ Wymagania:
 - 3 zbiory: --ratio jako 70/15/15 (train/val/test) i wtedy musisz podać wyjścia dla train/val/test.
 
 Przykład (3 zbiory):
-  python split_dataset_png_txt_simplified.py \
+  python split_png_adn_labels_data.py \
     --png-in ./images/all --txt-in ./labels/all \
     --png-train-out ./images/train --txt-train-out ./labels/train \
     --png-val-out ./images/val --txt-val-out ./labels/val \
