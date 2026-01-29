@@ -1,0 +1,4 @@
+scenario,bucket,TP,FP,FN,precision,recall,f1
+Summation_LQ,S,89,25,406,0.780702,0.179798,0.292282
+Summation_LQ,M,201,211,373,0.487864,0.350174,0.407708
+Summation_LQ,L,216,367,466,0.370497,0.316716,0.341502

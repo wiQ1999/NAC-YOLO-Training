@@ -1,0 +1,4 @@
+scenario,bucket,TP,FP,FN,precision,recall,f1
+Downsampling_LQ,S,431,511,64,0.457537,0.870707,0.599861
+Downsampling_LQ,M,464,178,110,0.722741,0.808362,0.763158
+Downsampling_LQ,L,434,152,248,0.740614,0.636364,0.684543
