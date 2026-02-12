@@ -16,7 +16,6 @@ Evaluate how crater detection quality changes under different degradation types:
 - `tools/` - Python scripts for data preparation, labeling, splitting, and analysis.
 - `bash/` - Bash scripts for NAC EDR (`.IMG`) to GeoTIFF processing.
 - `colab/train_model.ipynb` - main notebook for tuning, training, validation, and inference.
-- `data/` - raw and intermediate processing data (EDR, GeoTIFF, tiles, labels).
 - `datasets/` - ready YOLO datasets (`train/val/test`, `HQ_test`, `LQ_test`).
 - `runs/` - training/validation outputs (weights, metrics, plots, confusion matrices).
 - `img/` - thesis figures and qualitative prediction examples.
